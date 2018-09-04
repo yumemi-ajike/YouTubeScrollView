@@ -9,6 +9,10 @@
 import UIKit
 import YoutubeKit
 
+protocol VideoViewDelegate: class {
+    func videoViewDidEndPlaying(_ videoView: VideoView)
+}
+
 enum VideoViewState {
     case playing, paused
 }
@@ -16,6 +20,7 @@ enum VideoViewState {
 final class VideoView: UIView {
     private let videoID: String
     private var player: YTSwiftyPlayer!
+    weak var delegate: VideoViewDelegate?
     var contentSize: CGSize = .zero {
         didSet {
             snp.updateConstraints { (make) in
@@ -43,6 +48,7 @@ final class VideoView: UIView {
                                                  .showInfo(false)]
         player = YTSwiftyPlayer(frame: .zero, playerVars: parameters)
         player.isUserInteractionEnabled = false
+        player.delegate = self
         addSubview(player)
         
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(actionViewTapped(sender:)))
@@ -87,5 +93,47 @@ final class VideoView: UIView {
         } else {
             play()
         }
+    }
+}
+
+extension VideoView: YTSwiftyPlayerDelegate {
+    func player(_ player: YTSwiftyPlayer, didChangeState state: YTSwiftyPlayerState) {
+        if state == .ended {
+            delegate?.videoViewDidEndPlaying(self)
+            pause()
+            seekToBegining()
+        }
+    }
+    
+    func player(_ player: YTSwiftyPlayer, didChangeQuality quality: YTSwiftyVideoQuality) {
+        
+    }
+    
+    func player(_ player: YTSwiftyPlayer, didReceiveError error: YTSwiftyPlayerError) {
+        
+    }
+    
+    func player(_ player: YTSwiftyPlayer, didUpdateCurrentTime currentTime: Double) {
+        
+    }
+    
+    func player(_ player: YTSwiftyPlayer, didChangePlaybackRate playbackRate: Double) {
+        
+    }
+    
+    func playerReady(_ player: YTSwiftyPlayer) {
+        
+    }
+    
+    func apiDidChange(_ player: YTSwiftyPlayer) {
+        
+    }
+    
+    func youtubeIframeAPIReady(_ player: YTSwiftyPlayer) {
+        
+    }
+    
+    func youtubeIframeAPIFailedToLoad(_ player: YTSwiftyPlayer) {
+        
     }
 }

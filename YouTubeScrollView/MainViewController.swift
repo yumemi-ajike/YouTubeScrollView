@@ -37,6 +37,7 @@ class MainViewController: UIViewController {
             // スクロール表示領域に表示されていないと前/次の動画内容がレンダリングされないため、左右に1pxはみ出すように配置する
             let contentSize = CGSize(width: contentSize.width + arrangedInsets.left + arrangedInsets.right, height: contentSize.height)
             let videoView = VideoView(videoID: videoID, contentSize: contentSize)
+            videoView.delegate = self
             videoViews.append(videoView)
         }
         stackScrollView.pageIndex = initialPageIndex
@@ -62,5 +63,11 @@ extension MainViewController: StackScrollViewDelegate {
     func stackScrollView(_ stackScrollView: StackScrollView, didScrollToIndex index: Int) {
         let videoView = videoViews[index]
         videoView.play()
+    }
+}
+
+extension MainViewController: VideoViewDelegate {
+    func videoViewDidEndPlaying(_ videoView: VideoView) {
+        stackScrollView.scrollToNextPage(animated: true)
     }
 }
